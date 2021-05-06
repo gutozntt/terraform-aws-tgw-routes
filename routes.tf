@@ -7,7 +7,7 @@ data "aws_vpc" "vpc" {
 }
 
 locals {
-  all_routes = setproduct(tolist(data.aws_route_tables.vpc_rts.ids) , var.destination_cidr_blocks)
+  all_routes = setproduct(tolist(data.aws_route_tables.vpc_rts.ids), var.destination_cidr_blocks)
 
   map_routes = [
     for pair in local.all_routes : {
@@ -18,10 +18,10 @@ locals {
 }
 
 resource "aws_route" "vpc_rts" {
-  for_each                  = {
+  for_each = {
     for pair in local.map_routes : "${pair.route_table_id}_${pair.cidr_block}" => pair
   }
-  route_table_id            = each.value["route_table_id"]
-  destination_cidr_block    = each.value["cidr_block"]
-  transit_gateway_id        = var.tgw_id
+  route_table_id         = each.value["route_table_id"]
+  destination_cidr_block = each.value["cidr_block"]
+  transit_gateway_id     = var.tgw_id
 }
